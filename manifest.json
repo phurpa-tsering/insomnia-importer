@@ -1,0 +1,69 @@
+{
+  "id": "insomnia-importer",
+  "name": "Insomnia Collection Importer",
+  "description": "Import Insomnia v4 collection exports (.json) into Voiden \u2014 preserves folder structure, headers, query params, request bodies, and authentication.",
+  "version": "1.0.0",
+  "voidenVersion": ">=2.0.0",
+  "author": "Davinder",
+  "icon": "Download",
+  "type": "community",
+  "priority": 30,
+  "readme": "Import Insomnia v4 collection exports (.json) into Voiden \u2014 preserves folder structure, headers, query params, request bodies, and authentication.",
+  "mainProcess": false,
+  "permissions": [],
+  "capabilities": {
+    "ui": {
+      "buttons": [
+        {
+          "id": "insomnia-import-btn",
+          "location": "sidebar-left",
+          "icon": "Download",
+          "tooltip": "Import Insomnia Collection",
+          "description": "Opens file picker to select and import Insomnia v4 JSON collection exports"
+        }
+      ],
+      "description": "Adds import button to left sidebar for easy collection import"
+    },
+    "fileSystem": {
+      "operations": [
+        "create-directory",
+        "write-file"
+      ],
+      "description": "Creates folder structure and .void files from Insomnia collection hierarchy"
+    },
+    "integration": {
+      "dependencies": [
+        {
+          "extension": "voiden-rest-api",
+          "reason": "Uses voiden-rest-api helpers to generate compatible REST API blocks",
+          "required": true
+        }
+      ],
+      "description": "Depends on voiden-rest-api extension for REST block generation"
+    }
+  },
+  "features": [
+    "Import Insomnia v4 collection export JSON files",
+    "Automatically create folder structure matching collection hierarchy",
+    "Convert each request to a native .void file",
+    "Preserve request names and folder organization",
+    "Support for all HTTP methods (GET, POST, PUT, DELETE, PATCH, etc.)",
+    "Import request headers and convert to headers-table blocks",
+    "Import query parameters and convert to query-table blocks",
+    "Import path parameters extracted from :param URL segments",
+    "Import JSON request bodies and convert to json_body blocks",
+    "Import XML request bodies and convert to xml_body blocks",
+    "Import YAML request bodies and convert to yml_body blocks",
+    "Import binary bodies and convert to restFile blocks",
+    "Import form-data bodies and convert to multipart-table blocks",
+    "Merge authentication (Basic, Bearer, API Key, OAuth2) into headers",
+    "Sanitize file and folder names for filesystem compatibility",
+    "Progress tracking during import",
+    "Per-request error reporting without halting the full import",
+    "Batch file creation with throttling to prevent system overload",
+    "Uses voiden-rest-api helpers for consistent block generation",
+    "Generates markdown with proper YAML frontmatter",
+    "Nested folder support (unlimited depth)",
+    "Handles special characters in names"
+  ]
+}
