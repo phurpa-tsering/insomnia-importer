@@ -2,8 +2,11 @@
   {
     "version": "1.0.0",
     "date": "2026-06-04",
-    "changes": [
-      "Initial release"
-    ]
+    "changes": {
+       "Added": [
+        "Initial release of the Insomnia Collection Importer plugin for Voiden",
+        "Generated .void files now correctly link to the OpenAPI spec file"
+      ]
+    }
   }
 ]
