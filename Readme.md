@@ -30,8 +30,8 @@ A [Voiden](https://voiden.md) plugin that imports **Insomnia v4 collection expor
 ## Usage
 
 1. Export your collection from Insomnia: **Application → Export Data → Current Workspace → Insomnia v4 JSON**
-2. In Voiden, click the **Import Insomnia Collection** button in the left sidebar
-3. Select the exported `.json` file
+2. In Voiden, drop the JSON file in the active working project and open that JSON file.
+3. At the top right corner , you will see `Import into voiden`. 
 4. The plugin creates a folder matching the workspace name and populates it with `.void` files
 
 ## Building
