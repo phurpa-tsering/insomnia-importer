@@ -4,7 +4,7 @@
   "description": "Import Insomnia v4 collection exports (.json) into Voiden \u2014 preserves folder structure, headers, query params, request bodies, and authentication.",
   "version": "1.0.0",
   "voidenVersion": ">=2.0.0",
-  "author": "Davinder",
+  "author": "Phurpa Tsering",
   "icon": "logo.jpg",
   "type": "community",
   "priority": 30,
