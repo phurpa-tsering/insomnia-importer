@@ -1,9 +1,9 @@
 {
   "name": "@voiden/plugin-insomnia-importer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "private": false,
-  "description": "Import Insomnia v4 collection exports (.json) into Voiden — preserves folder structure, headers, query params, request bodies, and authentication.",
+  "description": "Import Insomnia v4 (.json) and v5 (.yaml/.json) collection exports into Voiden — preserves folder structure, headers, query params, request bodies, and authentication.",
   "main": "./src/plugin.ts",
   "scripts": {
     "build": "node build.mjs && node build-main.mjs",
@@ -15,6 +15,9 @@
     "@voiden/sdk": ">=1.0.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "@voiden/sdk": "latest",

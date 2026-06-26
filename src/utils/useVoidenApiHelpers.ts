@@ -10,7 +10,7 @@ export interface VoidenApiHelpers {
   createXMLBodyNode: (body: string, contentType: string) => any;
   createMultipartTableNode: (formData: [string, string][]) => any;
   createUrlTableNode: (formData: [string, string][]) => any;
-  createPathTableNode: (params: [string, string][]) => any;
+  createPathParamsTableNode: (params: [string, string][]) => any;
   createQueryTableNode: (params: [string, string][]) => any;
   convertToVoidMarkdown: (jsonContent: any) => Promise<string>;
   convertBlocksToVoidFile: (title: string, blocks: any[]) => string;

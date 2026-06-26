@@ -1,14 +1,14 @@
 {
   "id": "insomnia-importer",
   "name": "Insomnia Collection Importer",
-  "description": "Import Insomnia v4 collection exports (.json) into Voiden \u2014 preserves folder structure, headers, query params, request bodies, and authentication.",
-  "version": "1.0.0",
+  "description": "Import Insomnia v4 (.json) and v5 (.yaml/.json) collection exports into Voiden \u2014 preserves folder structure, headers, query params, request bodies, and authentication.",
+  "version": "1.1.0",
   "voidenVersion": ">=2.0.0",
   "author": "Phurpa Tsering",
   "icon": "logo.jpg",
   "type": "community",
   "priority": 30,
-  "readme": "Import Insomnia v4 collection exports (.json) into Voiden \u2014 preserves folder structure, headers, query params, request bodies, and authentication.",
+  "readme": "Import Insomnia v4 (.json) and v5 (.yaml/.json) collection exports into Voiden \u2014 preserves folder structure, headers, query params, request bodies, and authentication.",
   "mainProcess": false,
   "permissions": [],
   "capabilities": {
@@ -19,7 +19,7 @@
           "location": "sidebar-left",
           "icon": "Download",
           "tooltip": "Import Insomnia Collection",
-          "description": "Opens file picker to select and import Insomnia v4 JSON collection exports"
+          "description": "Opens file picker to select and import Insomnia v4 (JSON) or v5 (YAML/JSON) collection exports"
         }
       ],
       "description": "Adds import button to left sidebar for easy collection import"
@@ -44,6 +44,7 @@
   },
   "features": [
     "Import Insomnia v4 collection export JSON files",
+    "Import Insomnia v5 collection export YAML/JSON files",
     "Automatically create folder structure matching collection hierarchy",
     "Convert each request to a native .void file",
     "Preserve request names and folder organization",

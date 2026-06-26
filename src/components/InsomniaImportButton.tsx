@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import yaml from 'js-yaml';
 import { importInsomniaCollection } from '../utils/converter';
 import { X, XCircle } from 'lucide-react';
 
@@ -97,9 +98,13 @@ export const InsomniaImportButton = ({ tab, showToast }: InsomniaImportButtonPro
       try {
         JSON.parse(content);
       } catch {
-        setError('Invalid JSON format');
-        setIsImporting(false);
-        return;
+        try {
+          yaml.load(content);
+        } catch {
+          setError('Invalid Insomnia export — not valid JSON or YAML');
+          setIsImporting(false);
+          return;
+        }
       }
 
       await importInsomniaCollection(

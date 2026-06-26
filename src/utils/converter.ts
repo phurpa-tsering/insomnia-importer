@@ -1,13 +1,18 @@
+import yaml from 'js-yaml';
 import type {
   InsomniaExport,
   InsomniaRequest,
   InsomniaBody,
   InsomniaResource,
+  InsomniaV5Export,
+  InsomniaV5Item,
 } from './types';
 import {
   isInsomniaWorkspace,
   isInsomniaRequestGroup,
   isInsomniaRequest,
+  isInsomniaV5Export,
+  isInsomniaV5Folder,
 } from './types';
 import { getVoidenApiHelpers } from './useVoidenApiHelpers';
 
@@ -48,6 +53,12 @@ function extractPathParams(url: string): string[] {
   const path = url.split('?')[0];
   const matches = [...path.matchAll(/:([a-zA-Z_][a-zA-Z0-9_]*)/g)];
   return [...new Set(matches.map(m => m[1]))];
+}
+
+// Convert Insomnia's colon-style path segments (:id) to Voiden's brace-style
+// placeholders ({id}), e.g. "https://api.com/:id/:bye" -> "https://api.com/{id}/{bye}"
+function convertColonPathParams(url: string): string {
+  return url.replace(/:([a-zA-Z_][a-zA-Z0-9_]*)/g, '{$1}');
 }
 
 type BodyType = 'json' | 'xml' | 'yaml' | 'binary' | 'text' | 'multipart' | 'skip';
@@ -129,7 +140,7 @@ export const convertInsomniaRequestToVoidenSchema = async (data: InsomniaRequest
       type: 'request',
       content: [
         helpers.createMethodNode(data.method),
-        helpers.createUrlNode(data.url),
+        helpers.createUrlNode(convertColonPathParams(data.url)),
       ],
     });
 
@@ -148,7 +159,7 @@ export const convertInsomniaRequestToVoidenSchema = async (data: InsomniaRequest
     const pathParams = extractPathParams(data.url);
     if (pathParams.length > 0) {
       blocks.push(
-        helpers.createPathTableNode(
+        helpers.createPathParamsTableNode(
           pathParams.map(p => [p, ''] as [string, string])
         )
       );
@@ -280,6 +291,80 @@ export const processNodes = async (
   }
 };
 
+// Flattens a v5 collection tree (folders/requests nested via `children`) into
+// the same flat `InsomniaResource[]` shape the v4 importer already works with
+// (_id/_type/parentId), so buildTree/processNodes/countTotalRequests need no
+// v5-specific logic.
+function normalizeV5ToResources(data: InsomniaV5Export): InsomniaResource[] {
+  const resources: InsomniaResource[] = [];
+  const rootId = data.meta?.id ?? 'wrk_root';
+
+  resources.push({
+    _id: rootId,
+    _type: 'workspace',
+    parentId: null,
+    name: data.name,
+  });
+
+  let counter = 0;
+  const nextId = (prefix: string) => `${prefix}_${counter++}`;
+
+  const walk = (items: InsomniaV5Item[], parentId: string) => {
+    for (const item of items) {
+      if (isInsomniaV5Folder(item)) {
+        const folderId = item.meta?.id ?? nextId('fld');
+        resources.push({
+          _id: folderId,
+          _type: 'request_group',
+          parentId,
+          name: item.name,
+        });
+        walk(item.children, folderId);
+      } else {
+        resources.push({
+          _id: item.meta?.id ?? nextId('req'),
+          _type: 'request',
+          parentId,
+          name: item.name,
+          method: item.method,
+          url: item.url,
+          headers: item.headers,
+          parameters: item.parameters,
+          body: item.body,
+          authentication: item.authentication,
+        });
+      }
+    }
+  };
+
+  walk(data.collection ?? [], rootId);
+
+  return resources;
+}
+
+// Insomnia v4 exports are JSON with `_type: "export"`. Newer Insomnia versions
+// (v5+) export YAML (or JSON) with a `type: collection.insomnia.rest/5.x` marker
+// and a nested `collection` tree instead of a flat `resources` array.
+function parseInsomniaCollection(raw: string): InsomniaResource[] {
+  let parsed: any;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    parsed = yaml.load(raw);
+  }
+
+  if (isInsomniaV5Export(parsed)) {
+    return normalizeV5ToResources(parsed as InsomniaV5Export);
+  }
+
+  const data = parsed as InsomniaExport;
+  if (data?._type === 'export' && Array.isArray(data.resources)) {
+    return data.resources;
+  }
+
+  throw new Error('Unrecognized Insomnia export format (expected v4 JSON or v5 YAML/JSON)');
+}
+
 export const importInsomniaCollection = async (
   collectionJson: string,
   activeProject: string,
@@ -287,13 +372,11 @@ export const importInsomniaCollection = async (
   onError?: (itemName: string, error: unknown) => void,
   signal?: { cancelled: boolean },
 ) => {
-  const data: InsomniaExport = JSON.parse(collectionJson);
-
   if (!activeProject) {
     throw new Error('No active project found');
   }
 
-  const resources = data.resources ?? [];
+  const resources = parseInsomniaCollection(collectionJson);
 
   const workspaces = resources.filter(isInsomniaWorkspace);
   if (workspaces.length === 0) {

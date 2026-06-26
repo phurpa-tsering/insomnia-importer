@@ -1,10 +1,11 @@
 /**
  * Insomnia Collection Importer Extension
  *
- * Imports Insomnia v4 export files (.json) and converts them to Voiden .void request files.
+ * Imports Insomnia v4 (.json) and v5 (.yaml/.yml/.json) export files and
+ * converts them to Voiden .void request files.
  *
  * Features:
- * - Import Insomnia v4 export JSON files
+ * - Import Insomnia v4 export JSON files and v5 export YAML/JSON files
  * - Automatic conversion to Voiden's .void format
  * - Preserves folder (request_group) structure
  * - Supports headers, request bodies, query parameters, and authentication
@@ -30,10 +31,15 @@ const insomniaImportPlugin = (context: PluginContext) => {
             showToast,
           }),
         predicate: (tab) => {
-          // Show only for .json files that look like Insomnia exports
-          if (!tab.title?.endsWith('.json')) return false;
+          // Show for .json (v4) or .yaml/.yml/.json (v5) files that look like Insomnia exports
+          const title = tab.title ?? '';
+          const isCandidateFile = title.endsWith('.json') || title.endsWith('.yaml') || title.endsWith('.yml');
+          if (!isCandidateFile) return false;
+
           const c = tab.content ?? '';
-          return c.includes('__export_format') || c.includes('"_type":"export"') || c.includes('"_type": "export"');
+          const isV4 = c.includes('__export_format') || c.includes('"_type":"export"') || c.includes('"_type": "export"');
+          const isV5 = c.includes('collection.insomnia.rest/');
+          return isV4 || isV5;
         },
       });
     },

@@ -100,3 +100,45 @@ export function isInsomniaRequestGroup(r: InsomniaResource): r is InsomniaReques
 export function isInsomniaRequest(r: InsomniaResource): r is InsomniaRequest {
   return r._type === 'request';
 }
+
+/**
+ * Insomnia Collection Types (Export Format v5 — newer Insomnia versions)
+ *
+ * Exported as YAML (or JSON) with a `type: collection.insomnia.rest/5.0` marker.
+ * Unlike v4, there's no flat `resources` array with `_type`/`parentId` — it's a
+ * nested tree under `collection`, where folders are distinguished by having a
+ * `children` array and requests by having `url`/`method`.
+ */
+export interface InsomniaV5Export {
+  type: string; // e.g. "collection.insomnia.rest/5.0"
+  name: string;
+  meta?: { id?: string; created?: number; modified?: number };
+  collection?: InsomniaV5Item[];
+}
+
+export type InsomniaV5Item = InsomniaV5Folder | InsomniaV5RequestItem;
+
+export interface InsomniaV5Folder {
+  name: string;
+  meta?: { id?: string };
+  children: InsomniaV5Item[];
+}
+
+export interface InsomniaV5RequestItem {
+  name: string;
+  meta?: { id?: string };
+  method: string;
+  url: string;
+  headers?: InsomniaHeader[];
+  parameters?: InsomniaParameter[];
+  body?: InsomniaBody;
+  authentication?: InsomniaAuthentication;
+}
+
+export function isInsomniaV5Export(data: any): data is InsomniaV5Export {
+  return !!data && typeof data.type === 'string' && data.type.startsWith('collection.insomnia.rest/');
+}
+
+export function isInsomniaV5Folder(item: InsomniaV5Item): item is InsomniaV5Folder {
+  return Array.isArray((item as InsomniaV5Folder).children);
+}

@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.1.0",
+    "date": "2026-06-26",
+    "changes": {
+      "Added": [
+        "Support for importing Insomnia v5 collection exports (.yaml/.yml/.json), in addition to existing v4 (.json) support"
+      ],
+      "Fixed": [
+        "Path parameters (extracted from :param URL segments) were never generated during import — the converter was calling a helper method name that doesn't exist (createPathTableNode) instead of the real one (createPathParamsTableNode)"
+      ]
+    }
+  },
+  {
     "version": "1.0.0",
     "date": "2026-06-04",
     "changes": {
